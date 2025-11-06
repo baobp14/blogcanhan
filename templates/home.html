@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %} 
+
+{% block page_content %}
+<style>
+ /* CSS TÙY CHỈNH (giữ nguyên) */
+ .post-list { margin-top: 20px;}
+ .post { list-style: none; border-bottom: 1px solid #eee; padding: 15px 0; display: flex;}
+ .post:last-child { border-bottom: none;}
+ .profile-thumbnail { padding-right: 15px; flex-shrink: 0;}
+ .profile-thumbnail img { width: 40px; height: 40px; border-radius: 5px; border: 1px solid #ddd;}
+ .post-content { flex-grow: 1;}
+ .post-date { color: #999; font-size: 0.9em; margin-bottom: 5px;}
+ .post-author { font-weight: bold; color: #333;}
+ .post-body { margin-top: 5px;}
+ .well { background-color: #f7f7f7; border: 1px solid #e5e5e5; box-shadow: none; padding: 15px; border-radius: 8px;}
+ .pagination { margin: 20px 0; }
+    .post-footer {
+        margin-top: 10px;
+        font-size: 0.9em;
+    }
+</style>
+
+<div class="page-header">
+ <h1>Hello, {{ current_user.username }}!</h1>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+  <div class="well">
+   {{ wtf.quick_form(form, method='post') }}
+  </div>
+ </div>
+
+  <div class="col-md-4">
+ </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="btn-group" style="margin-bottom: 20px;">
+            <a href="{{ url_for('home', show='all') }}" class="btn btn-default {{ 'active' if show == 'all' }}">
+                All
+            </a>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('home', show='followed') }}" class="btn btn-default {{ 'active' if show == 'followed' }}">
+                Followed
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+ <div class="col-md-8 post-list">
+  {% for post in posts %}
+  <ul class="posts">
+   <li class="post">
+        <div class="profile-thumbnail">
+     <a href="{{ url_for('user_profile', username=post.author.username) }}">
+      <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
+     </a>
+    </div>
+    
+        <div class="post-content">
+     <div class="post-date">
+            <a href="{{ url_for('user_profile', username=post.author.username) }}" class="post-author">
+       {{ post.author.username }}
+      </a>
+      &middot; {{ moment(post.timestamp).fromNow() }}
+     </div>
+     <div class="post-body">
+      {{ post.body_html | safe }}
+     </div>
+       
+       <div class="post-footer">
+            {% if current_user == post.author %}
+            <a class="btn btn-xs btn-primary" href="{{ url_for('edit_post', id=post.id) }}">
+                Edit
+            </a>
+            {% endif %}
+            
+            <a class="btn btn-xs btn-default" href="{{ url_for('post', id=post.id) }}">
+                Permalink
+            </a>
+       </div>
+
+    </div>
+   </li>
+  </ul>
+  {% endfor %}
+ </div>
+</div>
+
+{% if pagination %}
+<div class="row">
+    <div class="col-md-8">
+        {{ macros.pagination_widget(pagination, 'home', show=show) }}
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

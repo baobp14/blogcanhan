@@ -1,0 +1,35 @@
+<ul class="posts">
+    {% for post in posts %}
+    <li class="post">
+        <div class="profile-thumbnail">
+            <a href="{{ url_for('user_profile', username=post.author.username) }}">
+                <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
+            </a>
+        </div>
+        
+        <div class="post-content">
+            <div class="post-date">
+                <a href="{{ url_for('user_profile', username=post.author.username) }}" class="post-author">
+                    {{ post.author.username }}
+                </a>
+                &middot; {{ moment(post.timestamp).fromNow() }}
+            </div>
+            <div class="post-body">
+                {{ post.body_html | safe }}
+            </div>
+            
+            <div class="post-footer">
+                {% if current_user == post.author %}
+                <a class="btn btn-xs btn-primary" href="{{ url_for('edit_post', id=post.id) }}">
+                    Edit
+                </a>
+                {% endif %}
+                
+                <a class="btn btn-xs btn-default" href="{{ url_for('post', id=post.id) }}">
+                    Permalink
+                </a>
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>

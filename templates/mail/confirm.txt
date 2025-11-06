@@ -1,0 +1,9 @@
+Chào {{ user.username }},
+
+Chào mừng bạn đến với Blog của Gia Bảo! 
+Vui lòng copy và dán link dưới đây vào trình duyệt để xác thực tài khoản của bạn:
+
+{{ url_for('confirm', token=token, _external=True) }}
+
+Trân trọng,
+Phạm Lê Gia Bảo

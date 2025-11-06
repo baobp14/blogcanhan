@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Hello, {{ current_user.username }}!</h1>
+</div>
+
+<h3>Bạn chưa xác thực tài khoản.</h3>
+<p>
+    Trước khi có thể truy cập trang này, bạn cần xác thực tài khoản.
+    Vui lòng kiểm tra hộp thư, bạn sẽ nhận được một email chứa link xác thực.
+</p>
+<p>
+    Bạn cần email xác thực khác? 
+    <a href="{{ url_for('resend_confirmation') }}">Bấm vào đây</a>
+</p>
+{% endblock %}

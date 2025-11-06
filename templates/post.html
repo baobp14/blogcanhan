@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %} 
+
+{% block page_content %}
+<style>
+ /* CSS TÙY CHỈNH (Sao chép từ home.html/post.html) */
+ .post-list { margin-top: 20px;}
+ .post { list-style: none; border-bottom: 1px solid #eee; padding: 15px 0; display: flex; }
+ .profile-thumbnail { padding-right: 15px; flex-shrink: 0; }
+ .profile-thumbnail img { width: 40px; height: 40px; border-radius: 5px; border: 1px solid #ddd; }
+ .post-content { flex-grow: 1; }
+ .post-date { color: #999; font-size: 0.9em; margin-bottom: 5px; }
+ .post-author { font-weight: bold; color: #333; }
+ .post-body { margin-top: 5px; }
+    .post-footer { margin-top: 10px; font-size: 0.9em; }
+    /* CSS cho Comments */
+    .comments-list { list-style: none; padding: 0; margin-top: 20px; }
+    .comment { border-bottom: 1px solid #eee; padding: 10px 0; display: flex; }
+    .comment-date { color: #999; font-size: 0.8em; margin-left: auto; align-self: flex-start;}
+    .comment-author { font-weight: bold; color: #333; margin-right: 10px; }
+    .comment-text { margin-top: 5px; }
+    .comment-content { flex-grow: 1; }
+    .comment-disabled {
+        opacity: 0.5;
+        background-color: #f9f9f9;
+    }
+</style>
+
+<div class="page-header">
+ <h1>Bài Đăng Chi Tiết</h1>
+</div>
+
+<div class="row">
+ <div class="col-md-8 post-list">
+  <ul class="posts">
+   <li class="post">
+        <div class="profile-thumbnail">
+     <a href="{{ url_for('user_profile', username=post.author.username) }}">
+      <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
+     </a>
+    </div>
+    
+        <div class="post-content">
+     <div class="post-date">
+            <a href="{{ url_for('user_profile', username=post.author.username) }}" class="post-author">
+       {{ post.author.username }}
+      </a>
+      &middot; {{ moment(post.timestamp).fromNow() }}
+     </div>
+     <div class="post-body">
+      {{ post.body_html | safe }}
+     </div>
+
+       <div class="post-footer">
+            {% if current_user == post.author %}
+            <a class="btn btn-xs btn-primary" href="{{ url_for('edit_post', id=post.id) }}">
+                Edit
+            </a>
+            {% endif %}
+            
+            <a class="btn btn-xs btn-default" href="{{ url_for('post', id=post.id) }}">
+                Permalink
+            </a>
+            <a class="btn btn-xs btn-info" href="{{ url_for('post', id=post.id, _anchor='comments') }}">
+                {{ post.comments.count() }} Comments
+            </a>
+       </div>
+
+    </div>
+   </li>
+  </ul>
+ </div>
+</div>
+
+<div class="row" id="comments">
+    <div class="col-md-8">
+        <h3 class="comments-title">Comments</h3>
+        
+        {% if current_user.is_authenticated %}
+        <div class="well">
+            {{ wtf.quick_form(form, action=url_for('post', id=post.id)) }} 
+        </div>
+        {% endif %}
+
+        {% if comments %}
+        <ul class="comments-list">
+        {% for comment in comments %}
+            <li class="comment {% if comment.disabled %}comment-disabled{% endif %}">
+                <div class="profile-thumbnail">
+                    <img class="img-rounded profile-thumbnail" src="{{ comment.author.gravatar(size=30) }}">
+                </div>
+                <div class="comment-content">
+                    <div class="comment-author">
+                        <a href="{{ url_for('user_profile', username=comment.author.username) }}">{{ comment.author.username }}</a>
+                    </div>
+                    
+                    <div class="comment-text">
+                        {{ comment.body }}
+
+                        {% if current_user.is_authenticated and (current_user == post.author or current_user.is_administrator) %}
+                            <div style="margin-top: 5px;">
+                                {% if comment.disabled %}
+                                    <span class="label label-danger">Disabled</span>
+                                    <a href="{{ url_for('enable_comment', id=comment.id) }}" class="btn btn-xs btn-success">
+                                        Enable
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('disable_comment', id=comment.id) }}" class="btn btn-xs btn-danger">
+                                        Disable
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="comment-date">
+                    {{ moment(comment.timestamp).fromNow() }}
+                </div>
+            </li>
+        {% endfor %}
+        </ul>
+        
+        {% if pagination %}
+        <div class="pagination pull-right">
+            {{ macros.pagination_widget(pagination, 'post', id=post.id, _anchor='comments') }}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <p>Chưa có bình luận nào.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %} ```

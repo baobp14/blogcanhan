@@ -1,0 +1,12 @@
+<p>Chào {{ user.username }},</p>
+<p>
+    Chào mừng bạn đến với ứng dụng của Gia Bảo! 
+    Vui lòng bấm vào link dưới đây để xác thực tài khoản của bạn:
+</p>
+<p>
+    <a href="{{ url_for('confirm', token=token, _external=True) }}">
+        Click để xác thực
+    </a>
+</p>
+<p>Trân trọng,</p>
+<p>Gia Bảo</p>
